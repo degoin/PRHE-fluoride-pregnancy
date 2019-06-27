@@ -25,6 +25,6 @@ ggplot(df_l %>% filter(measure==c("mat_urine","water_fluoride")), aes(x=measure,
 
 ggplot(df_l %>% filter(measure==c("serum_fluoride","amniotic_fluid")), aes(x=measure, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
-  scale_x_discrete(labels=c("Serum fluoride","Amniotic fluid"))
+  scale_x_discrete(labels=c("Maternal serum","Amniotic fluid"))
 
 
