@@ -28,3 +28,10 @@ ggplot(df_l %>% filter(measure==c("serum_fluoride","amniotic_fluid")), aes(x=mea
   scale_x_discrete(labels=c("Maternal serum","Amniotic fluid"))
 
 
+fit1 <- glm(mat_urine ~ water_fluoride + smoker + Age, data=df)
+
+fit2 <- glm(amniotic_fluid ~ water_fluoride + smoker + Age, data=df)
+
+fit3 <- glm(serum_fluoride ~ water_fluoride + smoker + Age, data=df)
+
+round(cor(df %>% select(water_fluoride, mat_urine, amniotic_fluid, serum_fluoride), use="pairwise.complete.obs"),2)
