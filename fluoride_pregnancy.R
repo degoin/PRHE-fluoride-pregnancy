@@ -33,11 +33,12 @@ df_m <- left_join(df, df_meiosis_chart)
 
 
 
-df_m$race_eth <- ifelse(df_m$ethnicity___1==1,1, 
-                        ifelse(df_m$ethnicity___2==1,2, 
-                               ifelse(df_m$ethnicity___3==1,3, 
-                                      ifelse(df_m$ethnicity___4==1,4, 
-                                             ifelse(df_m$ethnicity___5==1,5,NA)))))
+df_m$race_eth <- factor(ifelse(df_m$ethnicity___1==1,"Latina", 
+                        ifelse(df_m$ethnicity___2==1,"Black", 
+                               ifelse(df_m$ethnicity___3==1,"White", 
+                                      ifelse(df_m$ethnicity___4==1,"Asian/PI", 
+                                             ifelse(df_m$ethnicity___5==1,"Other",NA))))))
+
 
 # assuming grav means gravity and para means parity, but not sure 
 # smoker and smoking ipv are the same
@@ -87,10 +88,10 @@ df_m$drug_type <- ifelse(df_m$drug_substance___1==1,1,
                                 ifelse(df_m$drug_substance___3==1,3, 
                                        ifelse(df_m$drug_substance___4==1,4, NA))))
 
-df_m$mat_educ <- ifelse(df_m$edu<5, 1, 
-                        ifelse(df_m$edu==5 | df_m$edu==6,2, 
-                               ifelse(df_m$edu==7, 3, 
-                                      ifelse(df_m$edu>7, 4, NA))))
+df_m$mat_educ <- factor(ifelse(df_m$edu<5, "Less than high school", 
+                        ifelse(df_m$edu==5 | df_m$edu==6, "High school/GED", 
+                               ifelse(df_m$edu==7, "Some college", 
+                                      ifelse(df_m$edu>7, "College grad or postgrad", NA)))), ordered = T)
 
 # education 
 # 1 - 8th grade or less 
@@ -149,5 +150,12 @@ p2 <- ggplot(df_l %>% filter(measure==c("serum_fluoride","amniotic_fluid")), aes
 ggsave(p1, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/water_urine_fluoride_ppm.pdf", width=8)
 
 ggsave(p2, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/serum_amniotic_fluoride_ppm.pdf", width=8)
+
+# make table of descriptive statistics 
+
+df_m %>% group_by(race_eth) %>% summarise(N=n())  %>% mutate(proportion = N/sum(N)) 
+
+df_m %>% group_by(mat_educ) %>% summarise(N=n())  %>% mutate(proportion = N/sum(N))
+
 
 
