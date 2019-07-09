@@ -1,3 +1,4 @@
+rm(list=ls())
 # fluoride levels in pregnant women analyses 
 library(readxl)
 library(dplyr)
@@ -15,9 +16,6 @@ df$amniotic_fluid <- as.numeric(df$amniotic_fluid)
 
 df$ppt_id <- df$SAMPLE
 
-df_l <- df %>% gather(key="measure",value="concentration", water_fluoride, 
-                      mat_urine, amniotic_fluid, serum_fluoride)
-
 
 # read in WOC data to merge on covariates 
 
@@ -33,11 +31,6 @@ df_m <- left_join(df, df_meiosis_chart)
 # 3 - Medi-Care 
 # 9 - Missing 
 
-df_m  <- df_m %>% select(ppt_id, Age, age, insurance, gest_multiple, gest_us_w, gest_us_d, grav, para, bmi, smoker, smokingipy, 
-                        drugs, drug_substance___1, drug_substance___2, drug_substance___3, drug_substance___4, 
-                        drug_substance___9, drug_substance_other, zipcode, ethnicity___1, ethnicity___2, 
-                        ethnicity___3, ethnicity___4, ethnicity___5, ethnicity___9, marital_status, language, 
-                        country)
 
 
 df_m$race_eth <- ifelse(df_m$ethnicity___1==1,1, 
@@ -89,6 +82,16 @@ df_meiosis_bpa <-  df_meiosis_bpa %>%  select(ppt_id, edu)
 
 df_m <- left_join(df_m, df_meiosis_bpa, by="ppt_id")
 
+df_m$drug_type <- ifelse(df_m$drug_substance___1==1,1, 
+                         ifelse(df_m$drug_substance___2==1,2, 
+                                ifelse(df_m$drug_substance___3==1,3, 
+                                       ifelse(df_m$drug_substance___4==1,4, NA))))
+
+df_m$mat_educ <- ifelse(df_m$edu<5, 1, 
+                        ifelse(df_m$edu==5 | df_m$edu==6,2, 
+                               ifelse(df_m$edu==7, 3, 
+                                      ifelse(df_m$edu>7, 4, NA))))
+
 # education 
 # 1 - 8th grade or less 
 # 2 - 9th grade 
@@ -102,6 +105,21 @@ df_m <- left_join(df_m, df_meiosis_bpa, by="ppt_id")
 # -7 - I don't know 
 # -8 - Refused
 
+# recoded educ 
+# 1 - less than high school 
+# 2 - high school or GED 
+# 3 - some college 
+# 4 - college grad or postgraduate 
+
+df_m <- df_m %>% select(ppt_id, zipcode, Age, age, race_eth, mat_educ, edu, insurance, gest_multiple, 
+                        gest_us_w, gest_us_d, grav, para, bmi, smoker, smokingipy, 
+                        drugs, drug_type, marital_status, language, country, water_fluoride, mat_urine, 
+                        serum_fluoride, amniotic_fluid)
+
+
+
+df_l <- df_m %>% gather(key="measure",value="concentration", water_fluoride, 
+                      mat_urine, amniotic_fluid, serum_fluoride)
 
 
 ggplot(df_l, aes(x=measure, y=concentration)) + geom_boxplot()
@@ -128,10 +146,3 @@ cor_mat <- data.frame(round(cor(df %>% select(water_fluoride, mat_urine, amnioti
 rownames(cor_mat) <- colnames(cor_mat) <- c("Water","Maternal urine","Amniotic fluid","Maternal serum")
 write.csv(cor_mat, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/correlation_matrix.csv")
 
-
-all_df <- read.csv('/Users/danagoin/Documents/Fluoride and pregnant women/questionnaire_fmt.csv')
-                   
-
-test <- left_join(all_df, df)
-                   
-                   ")
