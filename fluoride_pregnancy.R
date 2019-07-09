@@ -111,13 +111,27 @@ df_m$mat_educ <- ifelse(df_m$edu<5, 1,
 # 3 - some college 
 # 4 - college grad or postgraduate 
 
+
+# select variables to keep 
 df_m <- df_m %>% select(ppt_id, zipcode, Age, age, race_eth, mat_educ, edu, insurance, gest_multiple, 
                         gest_us_w, gest_us_d, grav, para, bmi, smoker, smokingipy, 
                         drugs, drug_type, marital_status, language, country, water_fluoride, mat_urine, 
                         serum_fluoride, amniotic_fluid)
 
 
+# recreate results from paper
+fit1 <- glm(mat_urine ~ water_fluoride + smoker + Age, data=df_m)
 
+fit2 <- glm(amniotic_fluid ~ water_fluoride + smoker + Age, data=df_m)
+
+fit3 <- glm(serum_fluoride ~ water_fluoride + smoker + Age, data=df_m)
+
+cor_mat <- data.frame(round(cor(df %>% select(water_fluoride, mat_urine, amniotic_fluid, serum_fluoride), use="pairwise.complete.obs"),2))
+rownames(cor_mat) <- colnames(cor_mat) <- c("Water","Maternal urine","Amniotic fluid","Maternal serum")
+write.csv(cor_mat, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/correlation_matrix.csv")
+
+
+# reorganize to make box plots
 df_l <- df_m %>% gather(key="measure",value="concentration", water_fluoride, 
                       mat_urine, amniotic_fluid, serum_fluoride)
 
@@ -136,13 +150,4 @@ ggsave(p1, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluo
 
 ggsave(p2, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/serum_amniotic_fluoride_ppm.pdf", width=8)
 
-fit1 <- glm(mat_urine ~ water_fluoride + smoker + Age, data=df)
-
-fit2 <- glm(amniotic_fluid ~ water_fluoride + smoker + Age, data=df)
-
-fit3 <- glm(serum_fluoride ~ water_fluoride + smoker + Age, data=df)
-
-cor_mat <- data.frame(round(cor(df %>% select(water_fluoride, mat_urine, amniotic_fluid, serum_fluoride), use="pairwise.complete.obs"),2))
-rownames(cor_mat) <- colnames(cor_mat) <- c("Water","Maternal urine","Amniotic fluid","Maternal serum")
-write.csv(cor_mat, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/correlation_matrix.csv")
 
