@@ -13,8 +13,95 @@ df <- df %>% rename(smoker=`Smoker?`, water_fluoride=`Water Fluoride`, mat_urine
 
 df$amniotic_fluid <- as.numeric(df$amniotic_fluid) 
 
+df$ppt_id <- df$SAMPLE
+
 df_l <- df %>% gather(key="measure",value="concentration", water_fluoride, 
                       mat_urine, amniotic_fluid, serum_fluoride)
+
+
+# read in WOC data to merge on covariates 
+
+df_meiosis_chart <- read.csv('/Users/danagoin/Documents/Fluoride and pregnant women/Meiosis_Chart/meiosis_chart.csv')
+
+df_m <- left_join(df, df_meiosis_chart)
+# there are two people whose ages differ in these two sources 
+
+# insurance 
+# 0 - Medi-Cal 
+# 1 - Private / HMO
+# 2 - Self-Pay 
+# 3 - Medi-Care 
+# 9 - Missing 
+
+df_m  <- df_m %>% select(ppt_id, Age, age, insurance, gest_multiple, gest_us_w, gest_us_d, grav, para, bmi, smoker, smokingipy, 
+                        drugs, drug_substance___1, drug_substance___2, drug_substance___3, drug_substance___4, 
+                        drug_substance___9, drug_substance_other, zipcode, ethnicity___1, ethnicity___2, 
+                        ethnicity___3, ethnicity___4, ethnicity___5, ethnicity___9, marital_status, language, 
+                        country)
+
+
+df_m$race_eth <- ifelse(df_m$ethnicity___1==1,1, 
+                        ifelse(df_m$ethnicity___2==1,2, 
+                               ifelse(df_m$ethnicity___3==1,3, 
+                                      ifelse(df_m$ethnicity___4==1,4, 
+                                             ifelse(df_m$ethnicity___5==1,5,NA)))))
+
+# assuming grav means gravity and para means parity, but not sure 
+# smoker and smoking ipv are the same
+# drugs 
+# 0 - Never 
+# 1 - Former 
+# 2 - Current 
+# 9 - Missing
+
+# drug substance 
+# 1 - crack, cocaine
+# 2 - meth 
+# 3 - heroin 
+# 4 - other 
+# 9 - missing
+
+# ethnicity 
+# 1 - Latina 
+# 2 - Black 
+# 3 - White 
+# 4 - Asian/PI 
+# 5 - Other 
+# 9 - Missing
+
+# language 
+# 0 - English 
+# 1 - Spanish 
+# 2 - Other 
+# 9 - Missing 
+
+# country of origin 
+# 0 - USA 
+# 1 - Other 
+# 9 - Missing 
+
+
+# add on Meiosis BPA data for education variable 
+
+df_meiosis_bpa <- read.csv('/Users/danagoin/Documents/Fluoride and pregnant women/Meiosis_BPA/meiosis_bpa.csv')
+
+df_meiosis_bpa <-  df_meiosis_bpa %>%  select(ppt_id, edu)
+
+df_m <- left_join(df_m, df_meiosis_bpa, by="ppt_id")
+
+# education 
+# 1 - 8th grade or less 
+# 2 - 9th grade 
+# 3 - 10th grade 
+# 4 - 11th grade 
+# 5 - 12th grade
+# 6 - GED 
+# 7 - Some college 
+# 8 - College grad 
+# 9 - Graduate degree 
+# -7 - I don't know 
+# -8 - Refused
+
 
 
 ggplot(df_l, aes(x=measure, y=concentration)) + geom_boxplot()
