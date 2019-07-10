@@ -229,6 +229,11 @@ df_m %>% group_by(race_eth) %>% summarise(N=n())  %>% mutate(proportion = N/sum(
 
 df_m %>% group_by(mat_educ) %>% summarise(N=n())  %>% mutate(proportion = N/sum(N))
 
+df_m %>% group_by(parity) %>% summarise(N=n())  %>% mutate(proportion = N/sum(N))
+
+df_m  %>% summarise(mean=mean(Age, na.rm = T), sd=sqrt(var(Age, na.rm=T)), min=min(Age, na.rm=T), max=max(Age, na.rm=T))
+
+df_m  %>% summarise(mean=mean(bmi, na.rm = T), sd=sqrt(var(bmi, na.rm=T)), min=min(bmi, na.rm=T), max=max(bmi, na.rm=T))
 
 # differences between fluoridated (0.3 or above) and non-fluoridated community water
 
