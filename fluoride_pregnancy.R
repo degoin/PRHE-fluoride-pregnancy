@@ -96,6 +96,8 @@ df_m$mat_educ <- factor(ifelse(df_m$edu<5, "Less than high school",
                         levels=c("Less than high school", "High school/GED", 
                                  "Some college", "College grad or postgrad"), ordered = T)
 
+
+df_m$parity <- ifelse(df_m$para<5,df_m$para, ifelse(df_m$para==5,4,NA))
 # education 
 # 1 - 8th grade or less 
 # 2 - 9th grade 
@@ -137,6 +139,8 @@ ggplot(df_m, aes(bmi, amniotic_fluid)) + geom_point() + geom_smooth(span=1, meth
 ggplot(df_m, aes(Age, mat_urine)) + geom_point() + geom_smooth(span=1, method="loess")
 ggplot(df_m, aes(Age, serum_fluoride)) + geom_point() + geom_smooth(span=1, method="loess")
 ggplot(df_m, aes(Age, amniotic_fluid)) + geom_point() + geom_smooth(span=1, method="loess")
+
+
 
 fit2 <- glm(amniotic_fluid ~ water_fluoride + smoker + Age, data=df_m)
 
@@ -180,6 +184,7 @@ ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=race_eth, y=concentrati
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
   scale_x_discrete(labels=c("Latina","Black/African American","White","Asian/Pacific Islander"))
 
+
 # see if fluoride levels differ meaningfully by educational attainment 
 ggplot(df_l %>% filter(measure=="mat_urine"), aes(x=mat_educ, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
@@ -193,11 +198,64 @@ ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=mat_educ, y=concentrati
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
   scale_x_discrete(labels=c("Less than high school","High school grad/GED","Some college","College grad/postgraduate"))
 
+
+# see if fluoride levels differ meaningfully by parity
+ggplot(df_l %>% filter(measure=="mat_urine"), aes(x=factor(parity), y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="Parity",y="Mean concentration (ppm)") + 
+  scale_x_discrete(labels=c("0","1","2","3","4+"))
+
+ggplot(df_l %>% filter(measure=="serum_fluoride"), aes(x=factor(parity), y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="Parity",y="Mean concentration (ppm)") +
+  scale_x_discrete(labels=c("0","1","2","3","4+"))
+
+ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=factor(parity), y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="Parity",y="Mean concentration (ppm)") + 
+  scale_x_discrete(labels=c("0","1","2","3","4+"))
+
+
+# see if fluoride levels differ meaningfully by gravidity
+ggplot(df_l %>% filter(measure=="mat_urine"), aes(x=factor(grav), y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="Gravidity",y="Mean concentration (ppm)")
+
+ggplot(df_l %>% filter(measure=="serum_fluoride"), aes(x=factor(grav), y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="Gravidity",y="Mean concentration (ppm)")
+
+ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=factor(grav), y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="Gravidity",y="Mean concentration (ppm)")
+
 # make table of descriptive statistics 
 
 df_m %>% group_by(race_eth) %>% summarise(N=n())  %>% mutate(proportion = N/sum(N)) 
 
 df_m %>% group_by(mat_educ) %>% summarise(N=n())  %>% mutate(proportion = N/sum(N))
+
+
+# differences between fluoridated (0.3 or above) and non-fluoridated community water
+
+df_m$fluoridated_cm <- ifelse(df_m$water_fluoride>0.3,1,0)
+
+# mean - sd
+
+# water fluoride 
+df_m %>% group_by(fluoridated_cm) %>% summarise(mean=mean(water_fluoride, na.rm=T), sd=sqrt(var(water_fluoride, na.rm=T)))
+# urine fluoride
+df_m %>% group_by(fluoridated_cm) %>% summarise(mean=mean(mat_urine, na.rm=T), sd=sqrt(var(mat_urine, na.rm=T)))
+# serum fluoride
+df_m %>% group_by(fluoridated_cm) %>% summarise(mean=mean(serum_fluoride, na.rm=T), sd=sqrt(var(serum_fluoride, na.rm=T)))
+# amniotic fluid fluoride
+df_m %>% group_by(fluoridated_cm) %>% summarise(mean=mean(amniotic_fluid, na.rm=T), sd=sqrt(var(amniotic_fluid, na.rm=T)))
+
+# min - max
+
+# water fluoride 
+df_m %>% group_by(fluoridated_cm) %>% summarise(min=min(water_fluoride, na.rm=T), max=max(water_fluoride, na.rm=T))
+# urine fluoride
+df_m %>% group_by(fluoridated_cm) %>% summarise(min=min(mat_urine, na.rm=T), max=max(mat_urine, na.rm=T))
+# serum fluoride
+df_m %>% group_by(fluoridated_cm) %>% summarise(min=min(serum_fluoride, na.rm=T), max=max(serum_fluoride, na.rm=T))
+# amniotic fluid fluoride
+df_m %>% group_by(fluoridated_cm) %>% summarise(min=min(amniotic_fluid, na.rm=T), max=max(amniotic_fluid, na.rm=T))
+
 
 
 
