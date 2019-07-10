@@ -170,28 +170,28 @@ ggsave(p2, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluo
 # see if fluoride levels differ meaningfully by race/ethnicity 
 ggplot(df_l %>% filter(measure=="mat_urine"), aes(x=race_eth, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
-  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+  scale_x_discrete(labels=c("Latina","Black/African American","White","Asian/Pacific Islander"))
 
 ggplot(df_l %>% filter(measure=="serum_fluoride"), aes(x=race_eth, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
-  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+  scale_x_discrete(labels=c("Latina","Black/African American","White","Asian/Pacific Islander"))
 
 ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=race_eth, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
-  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+  scale_x_discrete(labels=c("Latina","Black/African American","White","Asian/Pacific Islander"))
 
 # see if fluoride levels differ meaningfully by educational attainment 
 ggplot(df_l %>% filter(measure=="mat_urine"), aes(x=mat_educ, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
-  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+  scale_x_discrete(labels=c("Less than high school","High school grad/GED","Some college","College grad/postgraduate"))
 
-ggplot(df_l %>% filter(measure=="serum_fluoride"), aes(x=race_eth, y=concentration)) + 
+ggplot(df_l %>% filter(measure=="serum_fluoride"), aes(x=mat_educ, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
-  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+  scale_x_discrete(labels=c("Less than high school","High school grad/GED","Some college","College grad/postgraduate"))
 
-ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=race_eth, y=concentration)) + 
+ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=mat_educ, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
-  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+  scale_x_discrete(labels=c("Less than high school","High school grad/GED","Some college","College grad/postgraduate"))
 
 # make table of descriptive statistics 
 
