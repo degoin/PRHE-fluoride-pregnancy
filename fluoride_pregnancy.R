@@ -257,5 +257,24 @@ df_m %>% group_by(fluoridated_cm) %>% summarise(min=min(serum_fluoride, na.rm=T)
 df_m %>% group_by(fluoridated_cm) %>% summarise(min=min(amniotic_fluid, na.rm=T), max=max(amniotic_fluid, na.rm=T))
 
 
+# t-tests for difference in means between fluorinated and non-fluorinated communities 
 
+# urine 
+x <- df_m[df_m$fluoridated_cm==0, "mat_urine"]
+y <- df_m[df_m$fluoridated_cm==1, "mat_urine"]
+
+t.test(x$mat_urine,y$mat_urine)
+
+# serum 
+x <- df_m[df_m$fluoridated_cm==0, "serum_fluoride"]
+y <- df_m[df_m$fluoridated_cm==1, "serum_fluoride"]
+
+t.test(x$serum_fluoride,y$serum_fluoride)
+
+
+# amniotic fluid 
+x <- df_m[df_m$fluoridated_cm==0, "amniotic_fluid"]
+y <- df_m[df_m$fluoridated_cm==1, "amniotic_fluid"]
+
+t.test(x$amniotic_fluid,y$amniotic_fluid)
 
