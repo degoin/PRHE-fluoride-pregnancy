@@ -37,7 +37,8 @@ df_m$race_eth <- factor(ifelse(df_m$ethnicity___1==1,"Latina",
                         ifelse(df_m$ethnicity___2==1,"Black", 
                                ifelse(df_m$ethnicity___3==1,"White", 
                                       ifelse(df_m$ethnicity___4==1,"Asian/PI", 
-                                             ifelse(df_m$ethnicity___5==1,"Other",NA))))))
+                                             ifelse(df_m$ethnicity___5==1,"Other",NA))))), 
+                        levels=c("Latina","Black","White","Asian/PI","Other"), ordered=T)
 
 
 # assuming grav means gravity and para means parity, but not sure 
@@ -91,7 +92,9 @@ df_m$drug_type <- ifelse(df_m$drug_substance___1==1,1,
 df_m$mat_educ <- factor(ifelse(df_m$edu<5, "Less than high school", 
                         ifelse(df_m$edu==5 | df_m$edu==6, "High school/GED", 
                                ifelse(df_m$edu==7, "Some college", 
-                                      ifelse(df_m$edu>7, "College grad or postgrad", NA)))), ordered = T)
+                                      ifelse(df_m$edu>7, "College grad or postgrad", NA)))), 
+                        levels=c("Less than high school", "High school/GED", 
+                                 "Some college", "College grad or postgrad"), ordered = T)
 
 # education 
 # 1 - 8th grade or less 
@@ -121,7 +124,19 @@ df_m <- df_m %>% select(ppt_id, zipcode, Age, age, race_eth, mat_educ, edu, insu
 
 
 # recreate results from paper
-fit1 <- glm(mat_urine ~ water_fluoride + smoker + Age, data=df_m)
+fit1 <- glm(mat_urine ~ water_fluoride + smoker + Age  + bmi, data=df_m)
+
+# see whether BMI has nonlinear relationship with fluoride levels 
+
+ggplot(df_m, aes(bmi, mat_urine)) + geom_point() + geom_smooth(span=1, method="loess")
+ggplot(df_m, aes(bmi, serum_fluoride)) + geom_point() + geom_smooth(span=1, method="loess")
+ggplot(df_m, aes(bmi, amniotic_fluid)) + geom_point() + geom_smooth(span=1, method="loess")
+
+# see whether age has nonlinear relationship with fluoride levels 
+
+ggplot(df_m, aes(Age, mat_urine)) + geom_point() + geom_smooth(span=1, method="loess")
+ggplot(df_m, aes(Age, serum_fluoride)) + geom_point() + geom_smooth(span=1, method="loess")
+ggplot(df_m, aes(Age, amniotic_fluid)) + geom_point() + geom_smooth(span=1, method="loess")
 
 fit2 <- glm(amniotic_fluid ~ water_fluoride + smoker + Age, data=df_m)
 
@@ -150,6 +165,33 @@ p2 <- ggplot(df_l %>% filter(measure==c("serum_fluoride","amniotic_fluid")), aes
 ggsave(p1, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/water_urine_fluoride_ppm.pdf", width=8)
 
 ggsave(p2, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/serum_amniotic_fluoride_ppm.pdf", width=8)
+
+
+# see if fluoride levels differ meaningfully by race/ethnicity 
+ggplot(df_l %>% filter(measure=="mat_urine"), aes(x=race_eth, y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
+  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+
+ggplot(df_l %>% filter(measure=="serum_fluoride"), aes(x=race_eth, y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
+  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+
+ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=race_eth, y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
+  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+
+# see if fluoride levels differ meaningfully by educational attainment 
+ggplot(df_l %>% filter(measure=="mat_urine"), aes(x=mat_educ, y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
+  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+
+ggplot(df_l %>% filter(measure=="serum_fluoride"), aes(x=race_eth, y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
+  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
+
+ggplot(df_l %>% filter(measure=="amniotic_fluid"), aes(x=race_eth, y=concentration)) + 
+  theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
+  scale_x_discrete(labels=c("Asian/Pacific Islander","Black/African American","Latina","White"))
 
 # make table of descriptive statistics 
 
