@@ -125,8 +125,29 @@ df_m <- df_m %>% select(ppt_id, zipcode, Age, age, race_eth, mat_educ, edu, insu
                         serum_fluoride, amniotic_fluid)
 
 
-# recreate results from paper
+# unadjusted results 
+fit1 <- glm(mat_urine ~ water_fluoride, data=df_m)
+round(coef(fit1),2)
+round(confint(fit1),2)
+
+fit2 <- glm(serum_fluoride ~ water_fluoride, data=df_m)
+round(coef(fit2),2)
+round(confint(fit2),3)
+
+fit3 <- glm(amniotic_fluid ~ water_fluoride, data=df_m)
+round(coef(fit3),2)
+round(confint(fit3),2)
+
+
+# adjusted results 
 fit1 <- glm(mat_urine ~ water_fluoride + smoker + Age  + bmi, data=df_m)
+qqnorm(residuals(fit1))
+qqline(residuals(fit1))
+
+round(coef(fit1),2)
+round(confint(fit1),2)
+
+
 
 # see whether BMI has nonlinear relationship with fluoride levels 
 
@@ -140,14 +161,24 @@ ggplot(df_m, aes(Age, mat_urine)) + geom_point() + geom_smooth(span=1, method="l
 ggplot(df_m, aes(Age, serum_fluoride)) + geom_point() + geom_smooth(span=1, method="loess")
 ggplot(df_m, aes(Age, amniotic_fluid)) + geom_point() + geom_smooth(span=1, method="loess")
 
+fit2 <- glm(serum_fluoride ~ water_fluoride + smoker + Age + bmi, data=df_m)
+qqnorm(residuals(fit2))
+qqline(residuals(fit2))
+
+round(coef(fit2),2)
+round(confint(fit2),2)
 
 
-fit2 <- glm(amniotic_fluid ~ water_fluoride + smoker + Age, data=df_m)
+fit3 <- glm(amniotic_fluid ~ water_fluoride + smoker + Age + bmi, data=df_m)
+qqnorm(residuals(fit3))
+qqline(residuals(fit3))
 
-fit3 <- glm(serum_fluoride ~ water_fluoride + smoker + Age, data=df_m)
+round(coef(fit3),2)
+round(confint(fit3),2)
 
-cor_mat <- data.frame(round(cor(df %>% select(water_fluoride, mat_urine, amniotic_fluid, serum_fluoride), use="pairwise.complete.obs"),2))
-rownames(cor_mat) <- colnames(cor_mat) <- c("Water","Maternal urine","Amniotic fluid","Maternal serum")
+
+cor_mat <- data.frame(round(cor(df %>% select(water_fluoride, mat_urine, serum_fluoride, amniotic_fluid), use="pairwise.complete.obs"),2))
+rownames(cor_mat) <- colnames(cor_mat) <- c("Water","Maternal urine","Maternal serum", "Amniotic fluid")
 write.csv(cor_mat, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/correlation_matrix.csv")
 
 
