@@ -126,26 +126,28 @@ df_m <- df_m %>% select(ppt_id, zipcode, Age, age, race_eth, mat_educ, edu, insu
 
 
 # unadjusted results 
-fit1 <- glm(mat_urine ~ water_fluoride, data=df_m)
-round(coef(fit1),2)
-round(confint(fit1),2)
+df_m$water_fluoride10 <- df_m$water_fluoride*10
 
-fit2 <- glm(serum_fluoride ~ water_fluoride, data=df_m)
-round(coef(fit2),2)
+fit1 <- glm(mat_urine ~ water_fluoride10, data=df_m)
+round(coef(fit1),3)
+round(confint(fit1),3)
+
+fit2 <- glm(serum_fluoride ~ water_fluoride10, data=df_m)
+round(coef(fit2),3)
 round(confint(fit2),3)
 
-fit3 <- glm(amniotic_fluid ~ water_fluoride, data=df_m)
-round(coef(fit3),2)
-round(confint(fit3),2)
+fit3 <- glm(amniotic_fluid ~ water_fluoride10, data=df_m)
+round(coef(fit3),3)
+round(confint(fit3),3)
 
 
 # adjusted results 
-fit1 <- glm(mat_urine ~ water_fluoride + smoker + Age  + bmi, data=df_m)
+fit1 <- glm(mat_urine ~ water_fluoride10 + smoker + Age  + bmi, data=df_m)
 qqnorm(residuals(fit1))
 qqline(residuals(fit1))
 
-round(coef(fit1),2)
-round(confint(fit1),2)
+round(coef(fit1),3)
+round(confint(fit1),3)
 
 
 
@@ -161,20 +163,20 @@ ggplot(df_m, aes(Age, mat_urine)) + geom_point() + geom_smooth(span=1, method="l
 ggplot(df_m, aes(Age, serum_fluoride)) + geom_point() + geom_smooth(span=1, method="loess")
 ggplot(df_m, aes(Age, amniotic_fluid)) + geom_point() + geom_smooth(span=1, method="loess")
 
-fit2 <- glm(serum_fluoride ~ water_fluoride + smoker + Age + bmi, data=df_m)
+fit2 <- glm(serum_fluoride ~ water_fluoride10 + smoker + Age + bmi, data=df_m)
 qqnorm(residuals(fit2))
 qqline(residuals(fit2))
 
-round(coef(fit2),2)
-round(confint(fit2),2)
+round(coef(fit2),3)
+round(confint(fit2),3)
 
 
-fit3 <- glm(amniotic_fluid ~ water_fluoride + smoker + Age + bmi, data=df_m)
+fit3 <- glm(amniotic_fluid ~ water_fluoride10 + smoker + Age + bmi, data=df_m)
 qqnorm(residuals(fit3))
 qqline(residuals(fit3))
 
-round(coef(fit3),2)
-round(confint(fit3),2)
+round(coef(fit3),3)
+round(confint(fit3),3)
 
 
 cor_mat <- data.frame(round(cor(df %>% select(water_fluoride, mat_urine, serum_fluoride, amniotic_fluid), use="pairwise.complete.obs"),2))
@@ -186,12 +188,14 @@ write.csv(cor_mat, file="/Users/danagoin/Documents/Fluoride and pregnant women/P
 df_l <- df_m %>% gather(key="measure",value="concentration", water_fluoride, 
                       mat_urine, amniotic_fluid, serum_fluoride)
 
+df_l$measure <- factor(df_l$measure, levels=c("water_fluoride","mat_urine","serum_fluoride","amniotic_fluid"), ordered = T)
+
 
 ggplot(df_l, aes(x=measure, y=concentration)) + geom_boxplot()
 
-p1 <- ggplot(df_l %>% filter(measure==c("mat_urine","water_fluoride")), aes(x=measure, y=concentration)) + 
+p1 <- ggplot(df_l %>% filter(measure==c("water_fluoride","mat_urine")), aes(x=measure, y=concentration)) + 
     theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
-    scale_x_discrete(labels=c("Maternal urine","Water"))
+    scale_x_discrete(labels=c("Community water","Maternal urine"))
 
 p2 <- ggplot(df_l %>% filter(measure==c("serum_fluoride","amniotic_fluid")), aes(x=measure, y=concentration)) + 
   theme_bw()  + geom_boxplot() + labs(x="",y="Mean concentration (ppm)") + 
@@ -296,6 +300,11 @@ df_m %>% group_by(fluoridated_cm) %>% summarise(min=min(amniotic_fluid, na.rm=T)
 
 
 # t-tests for difference in means between fluorinated and non-fluorinated communities 
+# water 
+x <- df_m[df_m$fluoridated_cm==0, "water_fluoride"]
+y <- df_m[df_m$fluoridated_cm==1, "water_fluoride"]
+
+t.test(x$water_fluoride,y$water_fluoride)
 
 # urine 
 x <- df_m[df_m$fluoridated_cm==0, "mat_urine"]
