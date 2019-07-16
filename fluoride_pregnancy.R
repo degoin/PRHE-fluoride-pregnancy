@@ -32,15 +32,27 @@ df_m <- left_join(df, df_meiosis_chart)
 # 9 - Missing 
 
 
+# use race/ethnicity from Biospecimen Log as its more complete 
 
-df_m$race_eth <- factor(ifelse(df_m$ethnicity___1==1,"Latina", 
-                        ifelse(df_m$ethnicity___2==1,"Black", 
-                               ifelse(df_m$ethnicity___3==1,"White", 
-                                      ifelse(df_m$ethnicity___4==1,"Asian/PI", 
-                                             ifelse(df_m$ethnicity___5==1,"Other",NA))))), 
-                        levels=c("Latina","Black","White","Asian/PI","Other"), ordered=T)
+df_bio <- read.csv('/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/biospecimen_log.csv')
+df_bio$ppt_id <- df_bio$meiosis_id
+df_bio <- df_bio %>% select(ppt_id, ethnicity)
 
+df_m <- left_join(df_m, df_bio)
 
+#df_m$race_eth <- factor(ifelse(df_m$ethnicity___1==1,"Latina", 
+#                        ifelse(df_m$ethnicity___2==1,"Black", 
+#                               ifelse(df_m$ethnicity___3==1,"White", 
+#                                      ifelse(df_m$ethnicity___4==1,"Asian/PI", 
+#                                             ifelse(df_m$ethnicity___5==1,"Other",NA))))), 
+#                        levels=c("Latina","Black","White","Asian/PI","Other"), ordered=T)
+
+df_m$race_eth <- ifelse(df_m$ethnicity=="White", 1, 
+                        ifelse(df_m$ethnicity=="Latina", 2, 
+                               ifelse(df_m$ethnicity=="African-American",3,
+                                      ifelse(df_m$ethnicity=="Asian" | df_m$ethnicity=="Pacific Islander",4, NA))))
+
+df_m$race_eth <- factor(df_m$race_eth, levels=c(1,2,3,4), labels=c("White","Latina","Black","Asian/Pacific Islander"))
 # assuming grav means gravity and para means parity, but not sure 
 # smoker and smoking ipv are the same
 # drugs 
