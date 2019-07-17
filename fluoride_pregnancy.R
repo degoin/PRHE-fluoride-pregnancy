@@ -16,6 +16,11 @@ df$amniotic_fluid <- as.numeric(df$amniotic_fluid)
 
 df$ppt_id <- df$SAMPLE
 
+eth <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/ethnicity.csv")
+bio <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/biospecimen_log.csv")
+bio$ethnicity_bio <- bio$ethnicity
+bio$ethnicity <- NULL
+bio$ppt_id <- bio$meiosis_id
 
 # read in WOC data to merge on covariates 
 
@@ -32,27 +37,17 @@ df_m <- left_join(df, df_meiosis_chart)
 # 9 - Missing 
 
 
-# use race/ethnicity from Biospecimen Log as its more complete 
 
-df_bio <- read.csv('/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/biospecimen_log.csv')
-df_bio$ppt_id <- df_bio$meiosis_id
-df_bio <- df_bio %>% select(ppt_id, ethnicity)
+df_m$race_eth <- factor(ifelse(df_m$ethnicity___1==1,"Latina", 
+                        ifelse(df_m$ethnicity___2==1,"Black", 
+                               ifelse(df_m$ethnicity___3==1,"White", 
+                                      ifelse(df_m$ethnicity___4==1,"Asian/PI", 
+                                             ifelse(df_m$ethnicity___5==1,"Other",NA))))), 
+                        levels=c("Latina","Black","White","Asian/PI","Other"), ordered=T)
 
-df_m <- left_join(df_m, df_bio)
 
-#df_m$race_eth <- factor(ifelse(df_m$ethnicity___1==1,"Latina", 
-#                        ifelse(df_m$ethnicity___2==1,"Black", 
-#                               ifelse(df_m$ethnicity___3==1,"White", 
-#                                      ifelse(df_m$ethnicity___4==1,"Asian/PI", 
-#                                             ifelse(df_m$ethnicity___5==1,"Other",NA))))), 
-#                        levels=c("Latina","Black","White","Asian/PI","Other"), ordered=T)
-
-df_m$race_eth <- ifelse(df_m$ethnicity=="White", 1, 
-                        ifelse(df_m$ethnicity=="Latina", 2, 
-                               ifelse(df_m$ethnicity=="African-American",3,
-                                      ifelse(df_m$ethnicity=="Asian" | df_m$ethnicity=="Pacific Islander",4, NA))))
-
-df_m$race_eth <- factor(df_m$race_eth, levels=c(1,2,3,4), labels=c("White","Latina","Black","Asian/Pacific Islander"))
+df_t <- left_join(df_m, eth)
+df_t <- left_join(df_t, bio %>% select(-disenrolled))
 # assuming grav means gravity and para means parity, but not sure 
 # smoker and smoking ipv are the same
 # drugs 
@@ -336,4 +331,45 @@ x <- df_m[df_m$fluoridated_cm==0, "amniotic_fluid"]
 y <- df_m[df_m$fluoridated_cm==1, "amniotic_fluid"]
 
 t.test(x$amniotic_fluid,y$amniotic_fluid)
+
+
+
+# create map of community water fluoride levels 
+
+# first use zip to zcta crosswalk from https://www.udsmapper.org/zcta-crosswalk.cfm 
+
+cw_z <- read_excel("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/zip_to_zcta_2018.xlsx")
+
+cw_z <- cw_z %>% filter(STATE=="CA")
+cw_z$zipcode <- as.numeric(cw_z$ZIP_CODE)
+
+df_m_cw <- left_join(df_m, cw_z)
+
+
+# first use crosswalk to get from zip codes to places using http://mcdc.missouri.edu/applications/geocorr2014.html
+# the Missouri Census Data Center crosswalk 
+
+cw <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/geocorr2014_zip_place.csv")
+
+cw$ZCTA <- as.character(cw$zcta5)
+
+df_m_cw <- left_join(df_m_cw, cw)
+df_m_cw$place <- as.character(df_m_cw$placefp)
+
+
+# fluoride water levels from https://www.waterboards.ca.gov/drinking_water/certlic/drinkingwater/documents/fluoridation/Tables/data2014_15.pdf 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
