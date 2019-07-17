@@ -371,15 +371,25 @@ df_m_cw3 <- left_join(df_m_cw2, cw)
 
 
 
+# water district boundaries from https://data.cnra.ca.gov/dataset/water-districts
+
+library(sf)
+library(rgdal)
+library(viridis)
+
+# shapefiles for water district boundaries
+
+water_shp <- st_read("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/Water_Districts/Water_Districts.shp")
+
+water_shp$Water_System_Name <- water_shp$AGENCYNAME
 
 
+# fluoride levels by water districts 
 
+fluoride_levels <- read_xlsx("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/data2014_15.xlsx")
+fluoride_levels <- fluoride_levels[complete.cases(fluoride_levels),]
 
-
-
-
-
-
-
+# join water district boundaries to fluoride levels 
+water_fl <- left_join(water_shp, fluoride_levels)
 
 
