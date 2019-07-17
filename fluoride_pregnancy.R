@@ -342,6 +342,38 @@ t.test(x$amniotic_fluid,y$amniotic_fluid)
 
 
 
+# create map of zip code level water fluoride levels 
+# zip code shape files 
+
+zip <- st_read("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/tl_2016_us_zcta510/tl_2016_us_zcta510.shp")
+#  zip to county  crosswalk 
+cw <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/geocorr2014_zip_county.csv")
+
+cw$ZCTA5CE10 <- cw$zcta5
+zip_m<- left_join(zip, cw)
+
+zip_m <- zip_m %>% filter(!is.na(county))
+
+zip_m$zipcode <- as.numeric(zip_m$ZCTA5CE10)
+
+# convert to sf object
+dat_c <- left_join(df_m, zip_m)
+dat_sf <- st_as_sf(dat_c) 
+
+# read in county boundaries 
+
+county <- st_read("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/tl_2016_us_county/tl_2016_us_county.shp")
+county <- county %>% filter(STATEFP=="06")
+
+map1 <- ggplot() + geom_sf(data=county) + theme_bw() + 
+  geom_sf(data=dat_sf, aes(fill=water_fluoride)) + scale_fill_viridis(name="Water fluoride (ppm)")
+
+ggsave(map1, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/zip_water_fluoride_map.pdf")
+
+
+#ggplot() + geom_sf(data=dat_sf, aes(fill=water_fluoride))
+#+ coord_sf(xlim=c(-120.75,-118.25), ylim=c(36, 37.5), expand=T) + 
+
 # create map of community water fluoride levels 
 
 # first use zip to zcta crosswalk from https://www.udsmapper.org/zcta-crosswalk.cfm 
@@ -408,7 +440,7 @@ fluoride_levels <- fluoride_levels[complete.cases(fluoride_levels),]
 fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "\\[.*\\]","")
 
 # join water district boundaries to fluoride levels 
-water_fl <- full_join(water_shp, fluoride_levels)
+water_fl <- right_join(water_shp, fluoride_levels)
 
 
 
