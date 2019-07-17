@@ -352,9 +352,19 @@ df_m_cw <- left_join(df_m, cw_z)
 cw <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/geocorr2014_zip_place.csv")
 
 cw$ZCTA <- as.character(cw$zcta5)
+cw <- cw %>% select(-pop10, -afact)
 
-df_m_cw <- left_join(df_m_cw, cw)
-df_m_cw$place <- as.character(df_m_cw$placefp)
+df_m_cw2 <- left_join(df_m_cw, cw)
+df_m_cw2$place <- as.character(df_m_cw2$placefp)
+
+
+# also now zip to county 
+cw <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/geocorr2014_zip_county.csv")
+
+cw$ZCTA <- as.character(cw$zcta5)
+cw <- cw %>% select(-pop10, -afact)
+
+df_m_cw3 <- left_join(df_m_cw2, cw)
 
 
 # fluoride water levels from https://www.waterboards.ca.gov/drinking_water/certlic/drinkingwater/documents/fluoridation/Tables/data2014_15.pdf 
