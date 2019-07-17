@@ -279,6 +279,14 @@ df_m  %>% summarise(mean=mean(Age, na.rm = T), sd=sqrt(var(Age, na.rm=T)), min=m
 
 df_m  %>% summarise(mean=mean(bmi, na.rm = T), sd=sqrt(var(bmi, na.rm=T)), min=min(bmi, na.rm=T), max=max(bmi, na.rm=T))
 
+
+df_m  %>% summarise(mean=mean(water_fluoride, na.rm = T), sd=sqrt(var(water_fluoride, na.rm=T)), min=min(water_fluoride, na.rm=T), max=max(water_fluoride, na.rm=T))
+df_m  %>% summarise(mean=mean(mat_urine, na.rm = T), sd=sqrt(var(mat_urine, na.rm=T)), min=min(mat_urine, na.rm=T), max=max(mat_urine, na.rm=T))
+df_m  %>% summarise(mean=mean(serum_fluoride, na.rm = T), sd=sqrt(var(serum_fluoride, na.rm=T)), min=min(serum_fluoride, na.rm=T), max=max(serum_fluoride, na.rm=T))
+df_m  %>% summarise(mean=mean(amniotic_fluid, na.rm = T), sd=sqrt(var(amniotic_fluid, na.rm=T)), min=min(amniotic_fluid, na.rm=T), max=max(amniotic_fluid, na.rm=T))
+
+
+
 # differences between fluoridated (0.3 or above) and non-fluoridated community water
 
 df_m$fluoridated_cm <- ifelse(df_m$water_fluoride>0.3,1,0)
@@ -376,12 +384,19 @@ df_m_cw3 <- left_join(df_m_cw2, cw)
 library(sf)
 library(rgdal)
 library(viridis)
+library(stringr)
 
 # shapefiles for water district boundaries
 
 water_shp <- st_read("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/Water_Districts/Water_Districts.shp")
 
-water_shp$Water_System_Name <- water_shp$AGENCYNAME
+water_shp$AGENCYNAME <- as.character(water_shp$AGENCYNAME)
+# rename water systems of cities 
+
+water_shp$Water_System_Name <- ifelse(grepl("City of", water_shp$AGENCYNAME, ignore.case=T), 
+                         paste("City of", gsub("City of", "", water_shp$AGENCYNAME, ignore.case = T)), 
+                         water_shp$AGENCYNAME)
+
 
 
 # fluoride levels by water districts 
@@ -389,7 +404,12 @@ water_shp$Water_System_Name <- water_shp$AGENCYNAME
 fluoride_levels <- read_xlsx("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/data2014_15.xlsx")
 fluoride_levels <- fluoride_levels[complete.cases(fluoride_levels),]
 
+# get ride of odd braket characters in system names 
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "\\[.*\\]","")
+
 # join water district boundaries to fluoride levels 
-water_fl <- left_join(water_shp, fluoride_levels)
+water_fl <- full_join(water_shp, fluoride_levels)
+
+
 
 
