@@ -386,8 +386,15 @@ df_ad$address <- ifelse(grepl("Moved", df_ad$address), NA, df_ad$address)
 df_ad$ppt_id <- df_ad$`Meiosis Study ID`
 
 df_ad <- df_ad %>% select(ppt_id, address)
+df_ad <- df_ad[complete.cases(df_ad),]
 
-write.csv(df_ad, file="/Users/danagoin/Documents/Fluoride and pregnant women/data/WOC_address.csv")
+df_ad$address <- gsub("Moutain", "Mountain", df_ad$address, ignore.case = T)
+df_ad$address <- gsub("Lauren St.", "Lauren Court", df_ad$address, ignore.case = T)
+df_ad$address <- gsub("1/2", "", df_ad$address)
+df_ad$address <- gsub("Petterson", "Patterson", df_ad$address, ignore.case = T)
+df_ad$address <- gsub("Snata Rosa", "Santa Rosa", df_ad$address, ignore.case = T)
+
+write.csv(df_ad, file="/Users/danagoin/Documents/Fluoride and pregnant women/data/WOC_address.csv", row.names = F)
 
 #ggplot() + geom_sf(data=dat_sf, aes(fill=water_fluoride))
 #+ coord_sf(xlim=c(-120.75,-118.25), ylim=c(36, 37.5), expand=T) + 
