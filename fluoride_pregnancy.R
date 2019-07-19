@@ -393,11 +393,134 @@ df_ad$address <- gsub("Lauren St.", "Lauren Court", df_ad$address, ignore.case =
 df_ad$address <- gsub("1/2", "", df_ad$address)
 df_ad$address <- gsub("Petterson", "Patterson", df_ad$address, ignore.case = T)
 df_ad$address <- gsub("Snata Rosa", "Santa Rosa", df_ad$address, ignore.case = T)
-
 write.csv(df_ad, file="/Users/danagoin/Documents/Fluoride and pregnant women/data/WOC_address.csv", row.names = F)
 
-#ggplot() + geom_sf(data=dat_sf, aes(fill=water_fluoride))
-#+ coord_sf(xlim=c(-120.75,-118.25), ylim=c(36, 37.5), expand=T) + 
+# fluoride water levels from https://www.waterboards.ca.gov/drinking_water/certlic/drinkingwater/documents/fluoridation/Tables/data2014_15.pdf 
+
+
+
+# water district boundaries from https://data.cnra.ca.gov/dataset/water-districts
+
+library(sf)
+library(rgdal)
+library(viridis)
+library(stringr)
+
+# shapefiles for water district boundaries
+
+water_shp <- st_read("/Users/danagoin/Documents/Fluoride and pregnant women/data/Water_Districts/Water_Districts.shp")
+
+water_shp$AGENCYNAME <- as.character(water_shp$AGENCYNAME)
+# rename water systems of cities 
+
+water_shp$Water_System_Name <- ifelse(grepl("City of", water_shp$AGENCYNAME, ignore.case=T), 
+                                      paste("City of", gsub("City of", "", water_shp$AGENCYNAME, ignore.case = T)), 
+                                      water_shp$AGENCYNAME)
+
+# remove trailing spaces 
+water_shp$Water_System_Name <- str_squish(water_shp$Water_System_Name)
+
+# align names with fluoride level data 
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="City of Fresno Service area", 
+                                      "City of Fresno", water_shp$Water_System_Name)
+
+# fluoride levels by water districts 
+
+fluoride_levels <- read_xlsx("/Users/danagoin/Documents/Fluoride and pregnant women/data/data2014_15.xlsx")
+fluoride_levels <- fluoride_levels[complete.cases(fluoride_levels),]
+
+# get ride of odd braket characters in system names 
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "\\[.*\\]","")
+
+# remove trailing spaces 
+fluoride_levels$Water_System_Name <- str_squish(fluoride_levels$Water_System_Name)
+
+# replace incongruent places
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Cal-Water Service Co. (Oroville)",
+                                            "California Water Service Company - Oroville", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Golden State Water Co. (Bay Point)", 
+                                            "Golden State Water Company - Bay Point", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Jacoby Creek Co. WD",
+                                            "Jacoby Creek Community Water District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="City of Eureka", 
+                                            "City of Humboldt Bay Municipal Water District - Eureka", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Bellflower Somerset Mutual WC", 
+                                            "Bellflower-Somerset Mutual Water Company", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Golden State Water Co. (Claremont)",
+                                            "Golden State Water Company - Claremont", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Kinneloa Irrigation District (quarterly)", 
+                                            "Kinneloa Irrigation District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Suburban Water Sys. (Glendora)", 
+                                            "Suburban Water Systems - Glendora", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Cal-American WC (Baldwin Hills)",
+                                            "California American Water Company - Baldwin Hills", fluoride_levels$Water_System_Name)
+                                            
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Suburban Water Sys. (La Mirada)", 
+                                            "Suburban Water Systems - La Mirada", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Cal-American Water Co. (San Marino)", 
+                                            "California American Water Company - San Marino", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Golden State Water Co. (San Dimas)", 
+                                            "Golden State Water Company - San Dimas", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Walnut Park Mutual Water Co.",
+                                            "Walnut Park Mutual Water Company", fluoride_levels$Water_System_Name)
+
+
+
+
+
+
+
+
+
+
+
+# join water district boundaries to fluoride levels 
+water_fl <- left_join(water_shp, fluoride_levels)
+
+water_fl$fluoride_2014 <- as.numeric(water_fl$Average_2014)
+
+
+ggplot()  +  geom_sf(data=water_fl) 
+
+
+ggplot()  +  geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
+  scale_fill_viridis(name="Water Fluoride Levels 2014")   + 
+  labs(x="Longitude", y="Latitude")  
+
++ geom_point(data=dat_sf, aes(x=lon, y=lat, shape=participant), size =1, colour="red") + 
+  scale_shape(name="") + theme(legend.position = "right", legend.text=element_text(size=11)) 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # create map of community water fluoride levels 
 
@@ -430,43 +553,5 @@ cw$ZCTA <- as.character(cw$zcta5)
 cw <- cw %>% select(-pop10, -afact)
 
 df_m_cw3 <- left_join(df_m_cw2, cw)
-
-
-# fluoride water levels from https://www.waterboards.ca.gov/drinking_water/certlic/drinkingwater/documents/fluoridation/Tables/data2014_15.pdf 
-
-
-
-# water district boundaries from https://data.cnra.ca.gov/dataset/water-districts
-
-library(sf)
-library(rgdal)
-library(viridis)
-library(stringr)
-
-# shapefiles for water district boundaries
-
-water_shp <- st_read("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/Water_Districts/Water_Districts.shp")
-
-water_shp$AGENCYNAME <- as.character(water_shp$AGENCYNAME)
-# rename water systems of cities 
-
-water_shp$Water_System_Name <- ifelse(grepl("City of", water_shp$AGENCYNAME, ignore.case=T), 
-                         paste("City of", gsub("City of", "", water_shp$AGENCYNAME, ignore.case = T)), 
-                         water_shp$AGENCYNAME)
-
-
-
-# fluoride levels by water districts 
-
-fluoride_levels <- read_xlsx("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/data2014_15.xlsx")
-fluoride_levels <- fluoride_levels[complete.cases(fluoride_levels),]
-
-# get ride of odd braket characters in system names 
-fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "\\[.*\\]","")
-
-# join water district boundaries to fluoride levels 
-water_fl <- right_join(water_shp, fluoride_levels)
-
-
 
 
