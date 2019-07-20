@@ -424,7 +424,40 @@ water_shp$Water_System_Name <- str_squish(water_shp$Water_System_Name)
 water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="City of Fresno Service area", 
                                       "City of Fresno", water_shp$Water_System_Name)
 
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="Yuba City", 
+                                      "City of Yuba City", water_shp$Water_System_Name)
+
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="City of San Jose - Evergreen Edenvale Coyote", 
+                                      "City of San Jose - Evergreen", water_shp$Water_System_Name) 
+
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="Daly City", 
+                                      "City of Daly City", water_shp$Water_System_Name) 
+
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="Redwood City", 
+                                      "City of Redwood City", water_shp$Water_System_Name) 
+
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="City of Menlo Park Municipal Water District", 
+                                      "City of Menlo Park", water_shp$Water_System_Name) 
+
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="Hillsborough Town Of", 
+                                      "City of Hillsborough", water_shp$Water_System_Name) 
+
+
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="South Coast Water District- Capistrano Beach", 
+                                      "South Coast Water District - Capistrano Beach", water_shp$Water_System_Name) 
+
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="City of American Canyon - Water", 
+                                      "City of American Canyon", water_shp$Water_System_Name) 
+
+
+
+
+
+water_shp$Water_System_Name <- str_replace(water_shp$Water_System_Name, "US Air Force ","")
+
+
 # fluoride levels by water districts 
+#
 
 fluoride_levels <- read_xlsx("/Users/danagoin/Documents/Fluoride and pregnant women/data/data2014_15.xlsx")
 fluoride_levels <- fluoride_levels[complete.cases(fluoride_levels),]
@@ -434,6 +467,7 @@ fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Na
 
 # remove trailing spaces 
 fluoride_levels$Water_System_Name <- str_squish(fluoride_levels$Water_System_Name)
+
 
 # replace incongruent places
 fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Cal-Water Service Co. (Oroville)",
@@ -475,14 +509,103 @@ fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="
 fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Walnut Park Mutual Water Co.",
                                             "Walnut Park Mutual Water Company", fluoride_levels$Water_System_Name)
 
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Suburban Water Sys (Whittier)", 
+                                            "Suburban Water Systems- Whittier", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Suburban Water Sys. (Covina Knolls)", 
+                                            "Suburban Water Systems - Covina Knolls", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Suburban Water Sys. (San Jose)", 
+                                            "Suburban Water Systems- San Jose Hills", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="City of San Jose - NSJ/Alviso", 
+                                            "City of San Jose - Alviso NSJ", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="San Francisco Public Utility Comm. SFWS", 
+                                            "San Francisco Public Utilities Comission - City Distribution Division", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Yuima Municipal Water District - IDA", 
+                                            "Yuima Municipal Water District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Rincon Del Diablo Municipal Water District - ID-1", 
+                                            "Rincon Del Diablo Municipal Water District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Sacramento Suburban Water District -", 
+                                            "Sacramento Suburban Water District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Sacramento Suburban Water District -", 
+                                            "Sacramento Suburban Water District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Fallbrook Public Utility District", 
+                                            "Fallbrook Public Utilities District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Laguna/Vineyard", 
+                                            "Laguna-Vineyard", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="City of Roseville - West Train", 
+                                            "City of Roseville", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="East Orange County Water District - Retail Zone", 
+                                            "East Orange County Water District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="East Orange County Water District - Wholesale Zone", 
+                                            "East Orange County Water District", fluoride_levels$Water_System_Name)
+
+
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Golden State Water Company - West Orange-Cypress", 
+                                            "Golden State Water Company - West Orange", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="South Coast Water Dist. - South Coast", 
+                                            "South Coast Water District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Liberty Utilities - Lynwood/Rancho Dominguez", 
+                                            "Liberty Utilities - Lynwood", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Liberty Utilities - Norwalk/Bellflower", 
+                                            "Liberty Utilities - Bellflower/ Norwalk", fluoride_levels$Water_System_Name)
 
 
 
 
 
+# replace WD to water district 
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "WD","Water District")
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "WC","Water Company")
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "Sys\\.","System")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "Co\\.","Company")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "\\(","- ")
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "\\)","")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "Cal\\-","California ")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "CWWater","County Waterworks")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "MWater","Municipal Water")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "CSD","Community Service District")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "MID","Municipal Improvement District")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "Of","of")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "Districtistrict","District")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "WA","Water Agency")
+
+fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Name, "{e}","")
+
+# join water district boundaries to fluoride levels 
+water_shp$shape <- 1
+
+water_fl <- left_join(fluoride_levels, water_shp)
 
 
+View(water_fl[is.na(water_fl$shape),c("County","Water_System_Name")])
 
+water_shp$Water_System_Name[grepl("East Bay", water_shp$Water_System_Name)]
 
 
 # join water district boundaries to fluoride levels 
