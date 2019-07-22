@@ -166,6 +166,15 @@ p_grid <- plot_grid(p1,p2,p3, ncol=3)
 ggsave(p_grid, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/water_fluoride_scatter_grid.pdf", width=18)
 
 
+# plot ratio of maternal urine fluoride concentration to maternal serum fluoride concentration 
+df_m$urine_serum_fl_ratio <- df_m$mat_urine/df_m$serum_fluoride
+
+rp1<- ggplot(data=df_m, aes(x=water_fluoride, y=urine_serum_fl_ratio)) + geom_point() + 
+  geom_smooth(method="lm", se=F, linetype=2, color="black") + theme_bw() + 
+  labs(x="Water fluoride (ppm)", y="MUF/MSF") + theme(axis.text=element_text(size=15), axis.title=element_text(size=15, face="bold"))
+
+ggsave(rp1, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/muf_msf_ratio_plot.pdf", width=8)
+
 # adjusted results 
 fit1 <- glm(mat_urine ~ water_fluoride10 + smoker + Age  + bmi, data=df_m)
 qqnorm(residuals(fit1))
