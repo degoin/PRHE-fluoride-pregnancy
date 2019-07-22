@@ -600,7 +600,7 @@ fluoride_levels$Water_System_Name <- str_replace(fluoride_levels$Water_System_Na
 # join water district boundaries to fluoride levels 
 water_shp$shape <- 1
 
-water_fl <- left_join(fluoride_levels, water_shp)
+water_fl <- left_join(fluoride_levels,water_shp)
 
 
 View(water_fl[is.na(water_fl$shape),c("County","Water_System_Name")])
@@ -619,16 +619,26 @@ ggplot()  +  geom_sf(data=water_fl)
 
 ggplot()  +  geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
   scale_fill_viridis(name="Water Fluoride Levels 2014")   + 
-  labs(x="Longitude", y="Latitude")  
+  labs(x="Longitude", y="Latitude")  +  coord_sf(xlim=c(-123,-120), ylim=c(37, 40), expand=T)  
+  
+  
 
-+ geom_point(data=dat_sf, aes(x=lon, y=lat, shape=participant), size =1, colour="red") + 
+point <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/data/WOC_address_geocoded.csv")
+
+
+
+#ggplot()  +  geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
+#  scale_fill_viridis(name="Water Fluoride Levels 2014")   + 
+#  labs(x="Longitude", y="Latitude")  +  coord_sf(xlim=c(-123,-120), ylim=c(36, 41), expand=T)  +
+# geom_point(data=point, aes(x=lon, y=lat, shape=state), size =1, colour="red") + 
+#  scale_shape(name="") + theme(legend.position = "right", legend.text=element_text(size=11)) 
+
+
+ggplot()  +  geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
+  scale_fill_viridis(name="Water Fluoride Levels 2014")   + 
+  labs(x="Longitude", y="Latitude")    +
+  geom_point(data=point, aes(x=lon, y=lat, shape=state), size =1, colour="red") + 
   scale_shape(name="") + theme(legend.position = "right", legend.text=element_text(size=11)) 
-
-
-
-
-
-
 
 
 
