@@ -353,12 +353,13 @@ df_ad$address <- gsub("Apt.*", "", df_ad$Address, ignore.case = T)
 df_ad$address <- gsub("#.*", "", df_ad$address)
 
 df_ad$address <- paste(df_ad$address, df_ad$`City, State`, df_ad$`Zip Code at the time of blood collection`)
-df_ad$address <- ifelse(grepl("Moved", df_ad$address), NA, df_ad$address)
+df_ad$address <- gsub("Moved: ","", df_ad$address)
 
 df_ad$ppt_id <- df_ad$`Meiosis Study ID`
 
 df_ad <- df_ad %>% select(ppt_id, address)
 df_ad <- df_ad[complete.cases(df_ad),]
+dim(df_ad)
 
 df_ad$address <- gsub("Moutain", "Mountain", df_ad$address, ignore.case = T)
 df_ad$address <- gsub("Lauren St.", "Lauren Court", df_ad$address, ignore.case = T)
@@ -424,12 +425,16 @@ water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="City of Amer
 water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="City of Lomita - Water", 
                                       "City of Lomita", water_shp$Water_System_Name) 
 
+water_shp$Water_System_Name <- ifelse(water_shp$Water_System_Name=="US Navy Point Mugunas", 
+                                      "Point Mugu Naval Base", water_shp$Water_System_Name) 
+
 
 
 water_shp$Water_System_Name <- str_replace(water_shp$Water_System_Name, "Municupal","Municipal")
-
 water_shp$Water_System_Name <- str_replace(water_shp$Water_System_Name, "US Air Force ","")
 water_shp$Water_System_Name <- str_replace(water_shp$Water_System_Name, "Systems-","Systems -")
+water_shp$Water_System_Name <- str_replace(water_shp$Water_System_Name, "Of","of")
+
 
 
 # fluoride levels by water districts 
@@ -630,13 +635,37 @@ fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="
 fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Redlands MUD", 
                                             "City of Redlands", fluoride_levels$Water_System_Name)
 
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Guadalupe Valley Municipal Improvement District", 
+                                            "Guadalupe Valley Irrigation District", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="City of East Palo Alto", 
+                                            "East Palo Alto Service Area", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="City of Vallejo - Travis AFB WTP", 
+                                            "City of Vallejo", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Port Hueneme Naval Base", 
+                                            "City of Port Hueneme", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="USN - Camarillo Housing", 
+                                            "City of Camarillo", fluoride_levels$Water_System_Name)
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Pleasant Valley Mutual Water Company", 
+                                            "Pleasant Valley Community Water District", fluoride_levels$Water_System_Name)
+
+
+fluoride_levels$Water_System_Name <- ifelse(fluoride_levels$Water_System_Name=="Ventura County Waterworks District No. 1 - Moorpark", 
+                                            "Ventura County Waterworks District No. 01 - Moorpark", fluoride_levels$Water_System_Name)
+
+
+
 # remove trailing spaces 
 fluoride_levels$Water_System_Name <- str_squish(fluoride_levels$Water_System_Name)
 
 # questionable subsitutions 
 # plot water district boundaries with labels 
 
-#ggplot(data=water_shp[grepl("Redlands",water_shp$Water_System_Name),]) + geom_sf() + geom_sf_label(aes(label=Water_System_Name))
+ggplot(data=water_shp[grepl("Pleasant Valley",water_shp$Water_System_Name),]) + geom_sf() + geom_sf_label(aes(label=Water_System_Name))
 
 # the water fluoride levels have two different water treatment plants for Contra Costa Water District - Bollman and - Randall-Bold. 
 # according to Contra Costa water district website, the Randall-Bold facility is delievered to Contra Costa Water District 
@@ -658,28 +687,37 @@ water_shp$shape <- 1
 water_fl <- left_join(fluoride_levels,water_shp)
 
 
-View(water_fl[is.na(water_fl$shape),])
+#View(water_fl[is.na(water_fl$shape),])
 
-water_shp$Water_System_Name[grepl("San Francisco", water_shp$Water_System_Name)]
+#water_shp$Water_System_Name[grepl("Ventura", water_shp$Water_System_Name)]
 
 
 # join water district boundaries to fluoride levels 
 water_fl <- left_join(water_shp, fluoride_levels)
 
 
+water_fl$fluoride_2014 <- as.numeric(water_fl$Average_2014)
+#ggplot()  +  geom_sf(data=water_fl) 
 
-ggplot()  +  geom_sf(data=water_fl) 
 
-
-ggplot()  +  geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
-  scale_fill_viridis(name="Water Fluoride Levels 2014")   + 
-  labs(x="Longitude", y="Latitude")  +  coord_sf(xlim=c(-123,-120), ylim=c(37, 40), expand=T)  
+#ggplot()  +  geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
+#  scale_fill_viridis(name="Water Fluoride Levels in ppm in 2014")   + 
+#  labs(x="Longitude", y="Latitude") 
+#+  coord_sf(xlim=c(-123,-120), ylim=c(37, 40), expand=T)  
   
   
 
 point <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/data/WOC_address_geocoded.csv")
 
+point$include <- ifelse(point$state=="MT",0,
+                        ifelse(!point$ppt_id %in% df$SAMPLE, 0, 1))
 
+table(point$include, exclude = NULL)
+point$include <- ifelse(is.na(point$include),1, point$include)
+
+point <- point %>% filter(include==1)
+
+point <- left_join(point, df)
 
 #ggplot()  +  geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
 #  scale_fill_viridis(name="Water Fluoride Levels 2014")   + 
@@ -687,25 +725,45 @@ point <- read.csv("/Users/danagoin/Documents/Fluoride and pregnant women/data/WO
 # geom_point(data=point, aes(x=lon, y=lat, shape=state), size =1, colour="red") + 
 #  scale_shape(name="") + theme(legend.position = "right", legend.text=element_text(size=11)) 
 
+# read in state shapefile 
 
-ggplot()  +  geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
+ca_shp <- st_read("/Users/danagoin/Documents/Fluoride and pregnant women/data/tl_2014_us_state/tl_2014_us_state.shp")
+ca_shp <- ca_shp %>% filter(STATEFP=="06")
+
+# read in county shapefile 
+county <- st_read("/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/tl_2016_us_county/tl_2016_us_county.shp")
+county <- county %>% filter(STATEFP=="06")
+
+# make maps 
+ggplot()  +  geom_sf(data=ca_shp) + geom_sf(data=water_fl, aes(fill=fluoride_2014)) + 
   scale_fill_viridis(name="Water Fluoride Levels 2014")   + 
   labs(x="Longitude", y="Latitude")    +
-  geom_point(data=point, aes(x=lon, y=lat, shape=state), size =1, colour="red") + 
+  geom_point(data=point, aes(x=lon, y=lat, shape=factor(include)), size =1, colour="red") + 
   scale_shape(name="") + theme(legend.position = "right", legend.text=element_text(size=11)) 
 
 
 
+# map 1 with water district boundaries 
+
+m1 <- ggplot()  + geom_sf(data=ca_shp) + geom_sf(data=water_shp)   + 
+  labs(x="Longitude", y="Latitude")    +
+  geom_point(data=point, aes(x=lon, y=lat, color=water_fluoride), size =2) + scale_color_viridis(name="Water fluoride (ppm)", option="inferno") +
+   theme(legend.position = "right", legend.text=element_text(size=11)) + theme_bw()
 
 
 
+ggsave(m1, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/water_fluoride_ppt_wd_map.pdf")
+
+# map 2 with county boundaries 
+
+m2 <- ggplot()  + geom_sf(data=ca_shp) + geom_sf(data=county)   + 
+  labs(x="Longitude", y="Latitude")    +
+  geom_point(data=point, aes(x=lon, y=lat, color=water_fluoride), size =2) + scale_color_viridis(name="Water fluoride (ppm)", option="inferno") +
+  theme(legend.position = "right", legend.text=element_text(size=11)) + theme_bw()
 
 
 
-
-
-
-
+ggsave(m2, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/water_fluoride_ppt_cty_map.pdf")
 
 
 
