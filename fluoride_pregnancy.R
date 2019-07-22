@@ -147,6 +147,24 @@ fit3 <- glm(amniotic_fluid ~ water_fluoride10, data=df_m)
 round(coef(fit3),3)
 round(confint(fit3),3)
 
+# make plots 
+library(cowplot)
+p1 <- ggplot(data=df_m, aes(x=water_fluoride, y=mat_urine)) + geom_point() + 
+  geom_smooth(method="lm", se=F, linetype=2, color="black") + theme_bw() + 
+  labs(x="Water fluoride (ppm)", y="MUF (ppm)") + theme(axis.text=element_text(size=15), axis.title=element_text(size=15, face="bold"))
+
+p2 <- ggplot(data=df_m, aes(x=water_fluoride, y=serum_fluoride)) + geom_point() + 
+  geom_smooth(method="lm", se=F, linetype=2, color="black") + theme_bw() + scale_y_continuous(limits=c(0, 0.065)) +
+  labs(x="Water fluoride (ppm)", y="MSF (ppm)") + theme(axis.text=element_text(size=15), axis.title=element_text(size=15, face="bold"))
+
+p3 <- ggplot(data=df_m, aes(x=water_fluoride, y=amniotic_fluid)) + geom_point() + 
+  geom_smooth(method="lm", se=F, linetype=2, color="black") + theme_bw() + scale_y_continuous(limits=c(0, 0.065)) + 
+  labs(x="Water fluoride (ppm)", y="AFF (ppm)") + theme(axis.text=element_text(size=15), axis.title=element_text(size=15, face="bold"))
+
+p_grid <- plot_grid(p1,p2,p3, ncol=3)
+
+ggsave(p_grid, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/water_fluoride_scatter_grid.pdf", width=18)
+
 
 # adjusted results 
 fit1 <- glm(mat_urine ~ water_fluoride10 + smoker + Age  + bmi, data=df_m)
