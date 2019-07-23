@@ -314,9 +314,9 @@ df_m  %>% summarise(mean=mean(amniotic_fluid, na.rm = T), sd=sqrt(var(amniotic_f
 
 
 
-# differences between fluoridated (0.3 or above) and non-fluoridated community water
+# differences between fluoridated (0.7 or above) and non-fluoridated community water
 
-df_m$fluoridated_cm <- ifelse(df_m$water_fluoride>0.3,1,0)
+df_m$fluoridated_cm <- ifelse(df_m$water_fluoride>0.7,1,0)
 
 # mean - sd
 
