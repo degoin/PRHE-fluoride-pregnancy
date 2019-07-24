@@ -175,6 +175,17 @@ rp1<- ggplot(data=df_m, aes(x=water_fluoride, y=urine_serum_fl_ratio)) + geom_po
 
 ggsave(rp1, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/muf_msf_ratio_plot.pdf", width=8)
 
+# boxplots of ratio above and below 0.7 
+
+
+rp2 <- ggplot(df_m, aes(x=factor(fluoridated_cm), y=urine_serum_fl_ratio)) + 
+  theme_bw()  + geom_boxplot() + labs(x="",y="MUF/MSF") + 
+  scale_x_discrete(labels=c("Community water \nfluoride <=0.7 ppm","Community water \nfluoride >0.7 ppm")) + 
+  theme(axis.text=element_text(size=15), axis.title=element_text(size=15, face="bold"))
+
+ggsave(rp2, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/muf_msf_ratio_boxplot.pdf", width=8)
+
+
 # adjusted results 
 fit1 <- glm(mat_urine ~ water_fluoride10 + smoker + Age  + bmi, data=df_m)
 qqnorm(residuals(fit1))
