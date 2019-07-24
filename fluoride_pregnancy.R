@@ -189,6 +189,10 @@ ggsave(rp2, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-flu
 
 wilcox.test(df_m$urine_serum_fl_ratio ~ df_m$fluoridated_cm)
 
+# test whether the means are different using Welch's t-test 
+
+t.test(df_m$urine_serum_fl_ratio ~ df_m$fluoridated_cm)
+
 # adjusted results 
 fit1 <- glm(mat_urine ~ water_fluoride10 + smoker + Age  + bmi, data=df_m)
 qqnorm(residuals(fit1))
