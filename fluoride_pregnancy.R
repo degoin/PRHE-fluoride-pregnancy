@@ -185,6 +185,9 @@ rp2 <- ggplot(df_m, aes(x=factor(fluoridated_cm), y=urine_serum_fl_ratio)) +
 
 ggsave(rp2, file="/Users/danagoin/Documents/Fluoride and pregnant women/PRHE-fluoride-pregnancy/muf_msf_ratio_boxplot.pdf", width=8)
 
+# test whether the medians are different using the Wilcoxon rank sum test 
+
+wilcox.test(df_m$urine_serum_fl_ratio ~ df_m$fluoridated_cm)
 
 # adjusted results 
 fit1 <- glm(mat_urine ~ water_fluoride10 + smoker + Age  + bmi, data=df_m)
