@@ -5,7 +5,7 @@ library(dplyr)
 library(ggplot2)
 library(tidyverse)
 
-# read in data 
+# read in data -- testing
 
 df <- read_excel('/Users/danagoin/Box Sync/Fluoride and pregnant women/data/Data.xlsx')
 
