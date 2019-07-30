@@ -7,7 +7,7 @@ library(tidyverse)
 
 # read in data 
 
-df <- read_excel('/Users/danagoin/Box Sync/Fluoride and pregnant women/data/Data.xlsx')
+df <- read_excel('/Users/danagoin/Box Sync/Fluoride and pregnant women/PRHE-fluoride-pregnancy/data/Data.xlsx')
 
 df <- df %>% rename(smoker=`Smoker?`, water_fluoride=`Water Fluoride`, mat_urine = `maternal urine F MEAN (ppm)`, 
                     amniotic_fluid = `amniotic fluid MEAN (ppm)`, serum_fluoride = `Serum Fluoride (ppm)`)
@@ -16,15 +16,15 @@ df$amniotic_fluid <- as.numeric(df$amniotic_fluid)
 
 df$ppt_id <- df$SAMPLE
 
-eth <- read.csv("/Users/danagoin/Box Sync/Fluoride and pregnant women/data/ethnicity.csv")
-bio <- read.csv("/Users/danagoin/Box Sync/Fluoride and pregnant women/data/biospecimen_log.csv")
+eth <- read.csv("/Users/danagoin/Box Sync/Fluoride and pregnant women/PRHE-fluoride-pregnancy/data/ethnicity.csv")
+bio <- read.csv("/Users/danagoin/Box Sync/Fluoride and pregnant women/PRHE-fluoride-pregnancy/data/biospecimen_log.csv")
 bio$ethnicity_bio <- bio$ethnicity
 bio$ethnicity <- NULL
 bio$ppt_id <- bio$meiosis_id
 
 # read in WOC data to merge on covariates 
 
-df_meiosis_chart <- read.csv('/Users/danagoin/Box Sync/Fluoride and pregnant women/data/Meiosis_Chart/meiosis_chart.csv')
+df_meiosis_chart <- read.csv('/Users/danagoin/Box Sync/Fluoride and pregnant women/PRHE-fluoride-pregnancy/data/Meiosis_Chart/meiosis_chart.csv')
 
 df_m <- left_join(df, df_meiosis_chart)
 # there are two people whose ages differ in these two sources 
@@ -85,7 +85,7 @@ df_t <- left_join(df_t, bio %>% select(-disenrolled))
 
 # add on Meiosis BPA data for education variable 
 
-df_meiosis_bpa <- read.csv('/Users/danagoin/Box Sync/Fluoride and pregnant women/data/Meiosis_BPA/meiosis_bpa.csv')
+df_meiosis_bpa <- read.csv('/Users/danagoin/Box Sync/Fluoride and pregnant women/PRHE-fluoride-pregnancy/data/Meiosis_BPA/meiosis_bpa.csv')
 
 df_meiosis_bpa <-  df_meiosis_bpa %>%  select(ppt_id, edu)
 
